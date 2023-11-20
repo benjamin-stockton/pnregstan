@@ -2,25 +2,21 @@
 // X of size 'N X P'. 
 data {
   int<lower=0> N;
-  int<lower=0> N_tilde;
+  int<lower=0> N_ppd;
   int<lower=0> P;
   matrix[N,2] U;
   matrix[N,P] X;
-  matrix[N_tilde, P] X_tilde;
+  matrix[N_ppd, P] X_ppd;
 }
 
 transformed data {
-    vector[2] ones;
-    for (k in 1:2) {
-        ones[k] = 1;
-    }
-    matrix[2, 2] I_2 = diag_matrix(ones);
-    
-    vector[P] ones2;
-    for (k in 1:P) {
-        ones2[k] = 1;
-    }
-    matrix[P, P] I_p = diag_matrix(ones2);
+  vector[P] X_bar = 1.0 / N * (rep_vector(1.0, N)' * X)';
+  matrix[N, P] X_centered = X - rep_matrix(X_bar', N);
+  X_centered[,1] = rep_vector(1, N);
+  
+  vector[P] X_ppd_bar = 1.0 / N_ppd * (rep_vector(1.0, N_ppd)' * X_ppd)';
+  matrix[N_ppd, P] X_ppd_centered = X_ppd - rep_matrix(X_ppd_bar', N_ppd);
+  X_ppd_centered[,1] = rep_vector(1, N_ppd);
 }
 
 // The parameters accepted by the model. Our model
@@ -36,8 +32,7 @@ parameters {
 transformed parameters {
     matrix[N,2] Y;
     
-    // Y = diag_pre_multiply(latent_lengths, U);
-    Y = diag_matrix(latent_lengths) * U;
+    Y = diag_pre_multiply(latent_lengths, U);
 }
 
 // The model to be estimated. We model the output
@@ -46,7 +41,7 @@ transformed parameters {
 model {
     
     // Priors
-    matrix[N,2] mu = X * B;
+    matrix[N,2] mu = X_centered * B;
 
     mu_B ~ normal(0, 10);
     tau_B ~ inv_gamma(0.001, 0.001);
@@ -60,7 +55,7 @@ model {
         target+= (2-1) * log(latent_lengths[i]) - 1.0 / 2 * a * (latent_lengths[i] - b / a)^2;
     }
     
-    // matrix[P,P] Lambda_F = 1.0/ 5 * I_p + X' * X;
+    // matrix[P,P] Lambda_F = 1.0/ 5 * identity_matrix(P) + X' * X;
     
     // vector[P] mu_F_1 = inverse(Lambda_F) * X' * Y[,1];
     // vector[P] mu_F_2 = inverse(Lambda_F) * X' * Y[,2];
@@ -68,15 +63,15 @@ model {
     // // Sampling for Y
     // Y ~ multi_normal(mu, I_2);
     for (i in 1:N) {
-      Y[i,] ~ multi_normal(mu[i,], I_2);
+      Y[i,] ~ multi_normal(mu[i,], identity_matrix(2));
     }
     // B[,1] ~ multi_normal_prec(mu_F_1, Lambda_F);
     // B[,2] ~ multi_normal_prec(mu_F_2, Lambda_F);
 }
 
 generated quantities {
-    matrix[N, 2] mu = X * B;
-    matrix[N_tilde, 2] mu_tilde = X_tilde * B;
+    matrix[N, 2] mu = X_centered * B;
+    matrix[N_ppd, 2] mu_ppd = X_ppd_centered * B;
     vector[N] log_lik;
     
     for (i in 1:N) {
@@ -88,15 +83,15 @@ generated quantities {
     }
 
     // ppd draws from MVN
-    matrix[N_tilde, 2] Y_tilde;
+    matrix[N_ppd, 2] Y_ppd;
     // ppd draws projected to S^1
-    matrix[N_tilde, 2] U_tilde;
+    matrix[N_ppd, 2] U_ppd;
      // ppd draws converted to angles
-    vector<lower=-pi(), upper=pi()>[N_tilde] theta_tilde;
+    vector<lower=-pi(), upper=pi()>[N_ppd] theta_ppd;
     
-    for (n in 1:N_tilde) {
-        Y_tilde[n,] = multi_normal_rng(mu_tilde[n,], I_2)';
-        U_tilde[n,] = Y_tilde[n,] / sqrt(dot_self(Y_tilde[n,]));
-        theta_tilde[n] = atan2(U_tilde[n,2], U_tilde[n,1]);
+    for (n in 1:N_ppd) {
+        Y_ppd[n,] = multi_normal_rng(mu_ppd[n,], identity_matrix(2))';
+        U_ppd[n,] = Y_ppd[n,] / sqrt(dot_self(Y_ppd[n,]));
+        theta_ppd[n] = atan2(U_ppd[n,2], U_ppd[n,1]);
     }
 }
