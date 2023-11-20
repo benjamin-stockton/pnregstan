@@ -16,7 +16,7 @@
 #'   df <- pnreg_sim_data(N = 100, mu_X = 0, sigma_X = 1)
 #'   fit_pnreg_identity_model(theta = df$theta, X = df$X, X_ppd = df$X)
 #' }
-fit_pnreg_identity_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500) {
+fit_pnreg_identity_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, show_exceptions = FALSE, show_messages = FALSE) {
   stopifnot(is.numeric(theta) && max(abs(theta)) < 2*pi)
   U <- angle_to_unit_vec(theta)
   X_mat <- stats::model.matrix(~., data = as.data.frame(X))
@@ -36,8 +36,9 @@ fit_pnreg_identity_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter
                       iter_sampling = iter_sampling,
                       iter_warmup = iter_warmup,
                       refresh = refresh,
-                      show_exceptions = FALSE,
-                      show_messages = FALSE)
+                      show_exceptions = show_exceptions,
+                      show_messages = show_messages,
+                      chains = 2)
   
   return(fit)
 }

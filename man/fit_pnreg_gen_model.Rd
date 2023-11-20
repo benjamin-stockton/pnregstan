@@ -9,7 +9,7 @@ fit_pnreg_gen_model(
   X,
   X_ppd,
   iter_sampling = 1000,
-  iter_warmup = 1000,
+  iter_warmup = 3000,
   refresh = 500
 )
 }

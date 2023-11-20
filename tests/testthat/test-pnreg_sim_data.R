@@ -12,4 +12,5 @@ test_that("Dimensions are correct with passed X", {
   
   df <- pnreg_sim_data(100, X = X, B = B)
   expect_equal(ncol(df), 5)
+  expect_equal(nrow(df), 100)
 })

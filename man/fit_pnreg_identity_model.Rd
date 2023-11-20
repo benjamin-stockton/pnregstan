@@ -10,7 +10,9 @@ fit_pnreg_identity_model(
   X_ppd,
   iter_sampling = 1000,
   iter_warmup = 1000,
-  refresh = 500
+  refresh = 500,
+  show_exceptions = FALSE,
+  show_messages = FALSE
 )
 }
 \arguments{
