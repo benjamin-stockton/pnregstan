@@ -8,8 +8,8 @@ data {
   matrix[N, K] X;
   real<lower=0> sigma_0;
   
-  int<lower=0> N_tilde;
-  matrix[N_tilde, K] X_tilde;
+  int<lower=0> N_ppd;
+  matrix[N_ppd, K] X_ppd;
 }
 
 parameters {
@@ -58,50 +58,29 @@ model {
 generated quantities {
   real<lower=-pi(), upper=pi()> theta = atan2(mu_0[2], mu_0[1]);
   
-  // Draws for (1,...,T) (Not one-shot prediction)
-  matrix[N, 2] mu_ppd;
+  // Draws for (1,...,T,T+1,...,T+T_ppd) (Not one-shot prediction)
+  matrix[N+N_ppd, K] X_mat = append_rows(X, X_ppd);
+  matrix[N+N_ppd, 2] mu_ppd;
   mu_ppd[1,] = mu_0';
   
-  matrix[N,2] eta = X * B_mat;
+  matrix[N+N_ppd,2] eta = X_mat * B_mat;
   
-  matrix[N, 2] Y_ppd;
+  matrix[N+N_ppd, 2] Y_ppd;
   Y_ppd[1,] = multi_normal_rng(mu_ppd[1,] + eta[1,], Sigma)';
   
   // ppd draws projected to S^1
-  matrix[N, 2] U_ppd;
+  matrix[N+N_ppd, 2] U_ppd;
   U_ppd[1,] = Y_ppd[1,] / sqrt(dot_self(Y_ppd[1,]));
   
    // ppd draws converted to angles
-   vector<lower=-pi(), upper=pi()>[N] theta_ppd;
+   vector<lower=-pi(), upper=pi()>[N+N_ppd] theta_ppd;
    theta_ppd[1] = atan2(U_ppd[1,2], U_ppd[1,1]);
    
-  for (t in 2:N) {
+  for (t in 2:(N+N_ppd)) {
     mu_ppd[t,] = (mu_0 + auto_cor_mat * Y[t-1,]')';
     // Prediction/backcast for time t given observed Y_1,...,Y_{t-1}
     Y_ppd[t, ] = multi_normal_rng(mu_ppd[t,] + eta[t,], Sigma)';
     U_ppd[t, ] = Y_ppd[t,] / sqrt(dot_self(Y_ppd[t,]));
     theta_ppd[t] = atan2(U_ppd[t, 2], U_ppd[t, 1]);
-  }
-    
-  matrix[N_tilde, 2] mu_tilde;
-  mu_tilde[1,] = (mu_0' + Y[N,] * auto_cor_mat + X_tilde[1,] * B_mat);
-    
-  // ppd draws from MVN
-  matrix[N_tilde, 2] Y_tilde;
-  Y_tilde[1,] = multi_normal_rng(mu_tilde[1,], Sigma)';
-  
-  // ppd draws projected to S^1
-  matrix[N_tilde, 2] U_tilde;
-  U_tilde[1,] = Y_tilde[1,] / sqrt(dot_self(Y_tilde[1,]));
-  
-   // ppd draws converted to angles
-   vector<lower=-pi(), upper=pi()>[N_tilde] theta_tilde;
-   theta_tilde[1] = atan2(U_tilde[1,2], U_tilde[1,1]);
-   
-  for (t in 2:N_tilde) {
-    mu_tilde[t,] = (mu_0' + Y_tilde[t-1,] * auto_cor_mat + X_tilde[t,] * B_mat);
-    Y_tilde[t, ] = multi_normal_rng(mu_tilde[t,], Sigma)';
-    U_tilde[t, ] = Y_tilde[t,] / sqrt(dot_self(Y_tilde[t,]));
-    theta_tilde[t] = atan2(U_tilde[t, 2], U_tilde[t, 1]);
   }
 }
