@@ -12,7 +12,7 @@
 #'
 #' @examples
 #'  df <- pnreg_sim_data(N = 100, mu_X = 0, sigma_X = 1)
-pnreg_sim_data <- function(N = 100, B = c(5, 0.5, 0, 0.25), Sigma_theta = c(1,0,0,1), X = NULL, mu_X = NULL, sigma_X = NULL) {
+pnreg_sim_data <- function(N = 100, B = c(5, 0.5, 0.75, 0.25), Sigma_theta = c(1,0,0,1), X = NULL, mu_X = NULL, sigma_X = NULL) {
   B <- matrix(B, ncol = 2, byrow = TRUE)
   Sigma_theta <- matrix(Sigma_theta, nrow = 2, ncol = 2, byrow = TRUE)
   if (is.null(X) && is.numeric(mu_X) && is.numeric(sigma_X)) {

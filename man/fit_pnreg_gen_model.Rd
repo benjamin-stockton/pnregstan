@@ -10,7 +10,8 @@ fit_pnreg_gen_model(
   X_ppd,
   iter_sampling = 1000,
   iter_warmup = 3000,
-  refresh = 500
+  refresh = 500,
+  ...
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ fit_pnreg_gen_model(
 \item{iter_warmup}{int number of warmup iterations to sample per chain}
 
 \item{refresh}{int how often CmdStan should print an update. Set to 0 to suppress updates.}
+
+\item{...}{Other arguments to pass to CmdStan}
 }
 \value{
 A data frame of posterior summaries.
@@ -33,10 +36,12 @@ A data frame of posterior summaries.
 Fit the PN Regression Stan model and return posterior summaries. Covariance follows the constrained parameterization from
 }
 \examples{
+## Not run:
 if (instantiate::stan_cmdstan_exists()) {
   df <- pnreg_sim_data(N = 100, mu_X = 0, sigma_X = 1)
   fit_pnreg_identity_model(theta = df$theta, X = df$X, X_ppd = df$X)
 }
+## End(Not run)
 }
 \seealso{
 Other models: 

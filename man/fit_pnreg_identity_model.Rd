@@ -11,8 +11,7 @@ fit_pnreg_identity_model(
   iter_sampling = 1000,
   iter_warmup = 1000,
   refresh = 500,
-  show_exceptions = FALSE,
-  show_messages = FALSE
+  ...
 )
 }
 \arguments{
@@ -27,6 +26,8 @@ fit_pnreg_identity_model(
 \item{iter_warmup}{int number of warmup iterations to sample per chain}
 
 \item{refresh}{int how often CmdStan should print an update. Set to 0 to suppress updates.}
+
+\item{...}{Other arguments to pass to CmdStan}
 }
 \value{
 A data frame of posterior summaries.

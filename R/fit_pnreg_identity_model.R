@@ -10,13 +10,14 @@
 #' @param iter_warmup int number of warmup iterations to sample per chain
 #' @param refresh int how often CmdStan should print an update. Set to 0 to suppress updates.
 #' @param X_ppd a matrix of size N_tilde x P of predictors for the posterior predictive draws
+#' @param ... Other arguments to pass to CmdStan
 #'
 #' @examples
 #' if (instantiate::stan_cmdstan_exists()) {
 #'   df <- pnreg_sim_data(N = 100, mu_X = 0, sigma_X = 1)
 #'   fit_pnreg_identity_model(theta = df$theta, X = df$X, X_ppd = df$X)
 #' }
-fit_pnreg_identity_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, show_exceptions = FALSE, show_messages = FALSE) {
+fit_pnreg_identity_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500,...) {
   stopifnot(is.numeric(theta) && max(abs(theta)) < 2*pi)
   U <- angle_to_unit_vec(theta)
   X_mat <- stats::model.matrix(~., data = as.data.frame(X))
@@ -36,9 +37,8 @@ fit_pnreg_identity_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter
                       iter_sampling = iter_sampling,
                       iter_warmup = iter_warmup,
                       refresh = refresh,
-                      show_exceptions = show_exceptions,
-                      show_messages = show_messages,
-                      chains = 2)
+                      chains = 2,
+                      ...)
   
   return(fit)
 }

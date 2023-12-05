@@ -7,18 +7,25 @@
 #' @param iter_warmup int MCMC warmup iterations to send to CmdStan
 #' @param refresh  int how often should CmdStan print an update during sampling
 #' @param ... additional arguments to pass to CmdStan
+#' @param chains int number of MCMC chains
 #'
 #' @return fit a CmdStan fit object
 #' @export
 #'
 #' @examples
+#' ## Not run:
 #' if (instantiate::stan_cmdstan_exists()) {
-#'   df <- pn_arx_sim_data(N = 100, ar_X1 = c(0.24), ma_X1 = numeric(0), ar_X2 = c(0.75), ma_X2 = c(-0.25, 0.25))
+#'   df <- pn_arx_sim_data(N = 100, 
+#'   ar_X1 = c(0.24), ma_X1 = numeric(0), 
+#'   ar_X2 = c(0.75), ma_X2 = c(-0.25, 0.25))
 #'   
 #'   df_ppd <- df[91:100,]
-#'   fit_pn_arx_model(theta = df$theta[1:90], X = df[1:90,c("X1", "X2")], X_ppd = df_ppd[,c("X1", "X2")])
+#'   fit_pn_arx_model(theta = df$theta[1:90], 
+#'   X = df[1:90,c("X1", "X2")], 
+#'   X_ppd = df_ppd[,c("X1", "X2")])
 #' }
-fit_pn_arx_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, ...) {
+#' ## End(Not run)
+fit_pn_arx_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, chains = 2, ...) {
   stopifnot(is.numeric(theta) && max(abs(theta)) < 2*pi)
   U <- angle_to_unit_vec(theta)
   X_mat <- stats::model.matrix(~., data = as.data.frame(X))
@@ -30,7 +37,7 @@ fit_pn_arx_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup 
   )
   data_list <- list(N = length(theta),
                     N_ppd = nrow(X_ppd_mat),
-                    P = ncol(X_mat),
+                    K = ncol(X_mat),
                     U = U,
                     X = X_mat,
                     X_ppd = X_ppd_mat,
@@ -40,7 +47,7 @@ fit_pn_arx_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup 
                       iter_sampling = iter_sampling,
                       iter_warmup = iter_warmup,
                       refresh = refresh,
-                      chains = 2, ...)
+                      chains = chains, ...)
   
   return(fit)
 }

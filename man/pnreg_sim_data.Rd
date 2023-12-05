@@ -6,7 +6,7 @@
 \usage{
 pnreg_sim_data(
   N = 100,
-  B = c(5, 0.5, 0, 0.25),
+  B = c(5, 0.5, 0.75, 0.25),
   Sigma_theta = c(1, 0, 0, 1),
   X = NULL,
   mu_X = NULL,
