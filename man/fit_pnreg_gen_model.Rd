@@ -45,6 +45,7 @@ if (instantiate::stan_cmdstan_exists()) {
 }
 \seealso{
 Other models: 
-\code{\link{fit_pnreg_identity_model}()}
+\code{\link{fit_pnreg_identity_model}()},
+\code{\link{fit_vm_brms_model}()}
 }
 \concept{models}
