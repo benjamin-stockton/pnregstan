@@ -48,29 +48,32 @@ model {
     // mu_B ~ normal(0, 10);
     // tau_B ~ inv_gamma(0.001, 0.001);
 
-    to_vector(B) ~ normal(0, 10);
+    // to_vector(B) ~ normal(0, 1000);
     
     // Latent Length sampling
-    // vector[N] lengths_llpd;
+    vector[N] lengths_llpd;
     // vector[N] a = rows_dot_self(U);
     // vector[N] b = rows_dot_product(U, mu);
     for (i in 1:N) {
         real a = dot_self(U[i,]);
         real b = dot_product(U[i,], mu[i,]);
-        // lengths_llpd[i] = log(latent_lengths[i]) - 1.0 / 2 * a * (latent_lengths[i] - b / a)^2;
-        target += log(latent_lengths[i]) - 1.0 / 2 * (latent_lengths[i] * a - b)^2;
-        Y[i,] ~ multi_normal(mu[i,], identity_matrix(2));
+        lengths_llpd[i] = log(latent_lengths[i]) - 1.0 / 2 * a * (latent_lengths[i] - b / a)^2;
+        // target += log(latent_lengths[i]) - 1.0 / 2 * a * (latent_lengths[i] - b / a)^2;
+        // Y[i,] ~ multi_normal(mu[i,], identity_matrix(2));
     }
-    // target += sum(log(latent_lengths)) - 1.0 / 2 * quad_form(identity_matrix(N), (diag_matrix(a) * latent_lengths - b));
-    // target += sum(lengths_llpd);
+    // target += sum(log(latent_lengths)) - 1.0 / 2 * diag_matrix(a) * quad_form(identity_matrix(N), (latent_lengths - diag_matrix(1.0 / a) * b));
+    target += sum(lengths_llpd);
+    
+    Y[,1] ~ normal(mu[,1], 1);
+    Y[,2] ~ normal(mu[,2], 1);
     
     // matrix[P,P] Lambda_F = 1.0/ 100 * identity_matrix(P) + quad_form(identity_matrix(N), X);
-    // 
+
     // vector[P] mu_F_1 = inverse(Lambda_F) * X' * Y[,1];
     // vector[P] mu_F_2 = inverse(Lambda_F) * X' * Y[,2];
     // B[,1] ~ multi_normal_prec(mu_F_1, Lambda_F);
     // B[,2] ~ multi_normal_prec(mu_F_2, Lambda_F);
-    
+
     // // Sampling for Y
     // Y ~ multi_normal(mu, I_2);
     // for (i in 1:N) {

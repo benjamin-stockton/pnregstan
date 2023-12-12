@@ -39,9 +39,7 @@ fit_pnreg_gen_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warm
                       iter_sampling = iter_sampling,
                       iter_warmup = iter_warmup,
                       refresh = refresh,
-                      show_exceptions = FALSE,
-                      show_messages = FALSE,
-                      adapt_delta = 0.85,
+                      # adapt_delta = 0.8,
                       ...)
   
   return(fit)

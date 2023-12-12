@@ -35,6 +35,8 @@ transformed parameters {
     matrix[N,2] Y;
     
     Y = diag_pre_multiply(latent_lengths, U);
+    
+  real<lower=0> sigma = sqrt(sigma2);
 }
 
 // The model to be estimated. We model the output
@@ -49,11 +51,13 @@ model {
 
     // mu_B ~ normal(0, 10);
 
-    to_vector(B) ~ normal(0, 10000);
-    alpha ~ normal(0, 10000);
-    sigma2 ~ inv_gamma(0.01, 0.01);
+    // to_vector(B) ~ normal(0, 1000);
+    // alpha ~ normal(0, 1000);
+    sigma2 ~ inv_gamma(1.01, 0.01);
+    latent_lengths ~ normal(0, 10);
     
-    matrix[2, 2] Sigma_i = identity_matrix(2);
+    matrix[2,2] Sigma_i;
+    matrix[2,2] Lambda_i;
     
     // Latent Length sampling
     for (i in 1:N) {
@@ -61,27 +65,15 @@ model {
         Sigma_i[1, 2] = gamma[i];
         Sigma_i[2, 1] = gamma[i];
         Sigma_i[2, 2] = 1.0;
-        matrix[2,2] Lambda_i = inverse_spd(Sigma_i);
+        Lambda_i[1,1] = 1.0 / sigma2;
+        Lambda_i[1,2] = -gamma[i] / sigma2;
+        Lambda_i[2,1] = -gamma[i] / sigma2;
+        Lambda_i[2,2] = (sigma2 + gamma[i]^2) / sigma2;
         real A_i = quad_form(Lambda_i, U[i,]');
         real B_i = U[i,] * Lambda_i *  mu[i,]';
         target+= log(latent_lengths[i]) - 1.0 / 2 * A_i * (latent_lengths[i] - B_i / A_i)^2;
-    }
-    
-    // matrix[P,P] Lambda_F = 1.0/ 5 * I_p + X' * X;
-    
-    // vector[P] mu_F_1 = inverse(Lambda_F) * X' * Y[,1];
-    // vector[P] mu_F_2 = inverse(Lambda_F) * X' * Y[,2];
-    
-    // // Sampling for Y
-    for (i in 1:N) {
-      Sigma_i[1, 1] = sigma2 + gamma[i]^2;
-      Sigma_i[1, 2] = gamma[i];
-      Sigma_i[2, 1] = gamma[i];
-      Sigma_i[2, 2] = 1;
       Y[i,] ~ multi_normal(mu[i,], Sigma_i);
     }
-    // B[,1] ~ multi_normal_prec(mu_F_1, Lambda_F);
-    // B[,2] ~ multi_normal_prec(mu_F_2, Lambda_F);
 }
 
 generated quantities {
