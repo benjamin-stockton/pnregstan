@@ -30,22 +30,18 @@
 fit_pn_arx_id_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, chains = 2, ...) {
   stopifnot(is.numeric(theta) && max(abs(theta)) < 2*pi)
   U <- angle_to_unit_vec(theta)
-  U_lag <- rbind(matrix(NA, nrow = 1, ncol = 2), U[1:(length(theta)-1),])
-  X <- cbind(X, U_lag)
-  
-  X_mat <- stats::model.matrix(~., data = as.data.frame(X))
-  # X_ppd_mat <- stats::model.matrix(~., data = as.data.frame(X_ppd))
   
   model <- instantiate::stan_package_model(
-    name = "proj_normal_identity_reg",
+    name = "pn_arx_id_process",
     package = "pnregstan"
   )
-  data_list <- list(N = length(theta)-1,
-                    N_ppd = nrow(X_mat),
-                    P = ncol(X_mat),
-                    U = U[2:length(theta),],
-                    X = X_mat,
-                    X_ppd = X_mat)
+  data_list <- list(N = length(theta),
+                    N_ppd = nrow(X_ppd),
+                    K = ncol(X),
+                    U = U,
+                    X = X,
+                    X_ppd = X_ppd, 
+                    sigma_0 = 1)
   fit <- model$sample(data = data_list,
                       iter_sampling = iter_sampling,
                       iter_warmup = iter_warmup,

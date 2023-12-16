@@ -6,6 +6,7 @@ data {
   int<lower=0> K;
   matrix[N, 2] U;
   matrix[N, K] X;
+  
   real<lower=0> sigma_0;
   
   int<lower=0> N_ppd;
@@ -15,11 +16,12 @@ data {
 transformed data {
   vector[K] X_bar = 1.0 / N * (rep_vector(1.0, N)' * X)';
   matrix[N, K] X_centered = X - rep_matrix(X_bar', N);
-  X_centered[,1] = rep_vector(1, N);
+  
+  // matrix[N, 2] U_lag = append_row(rep_vector(0,2), U[1:N,]);
+  // X_centered = append_col(X_centered, U_lag);
   
   vector[K] X_ppd_bar = 1.0 / N_ppd * (rep_vector(1.0, N_ppd)' * X_ppd)';
   matrix[N_ppd, K] X_ppd_centered = X_ppd - rep_matrix(X_ppd_bar', N_ppd);
-  X_ppd_centered[,1] = rep_vector(1, N_ppd);
 }
 
 parameters {
@@ -48,7 +50,9 @@ model {
   real B = U[1,] * mu[1,]';
   target += log(latent_lengths[1]) - 1.0 / 2 * A * (latent_lengths[1] - B / A)^2;
   
-  Y[1,] ~ multi_normal(mu[1,], identity_matrix(2));
+  // Y[1,] ~ multi_normal(mu[1,], identity_matrix(2));
+  Y[1,1] ~ normal(mu[1,1], 1);
+  Y[1,2] ~ normal(mu[1,2], 1);
   
   // Latent Length sampling
   for (t in 2:N) {
@@ -56,7 +60,9 @@ model {
       A = dot_self(U[t,]');
       B = U[t,] * mu[t,]';
       target += log(latent_lengths[t]) - 1.0 / 2 * A * (latent_lengths[t] - B / A)^2;
-      Y[t,] ~ multi_normal_prec(mu[t,],  identity_matrix(2));
+      // Y[t,] ~ multi_normal_prec(mu[t,],  identity_matrix(2));
+      Y[t,1] ~ normal(mu[1,1], 1);
+      Y[t,2] ~ normal(mu[1,2], 1);
       
   }
 }
@@ -73,7 +79,9 @@ generated quantities {// Post-processed Parameters
   matrix[N+N_ppd,2] eta = X_mat * B_mat;
   
   matrix[N+N_ppd, 2] Y_ppd;
-  Y_ppd[1,] = multi_normal_rng(mu_ppd[1,] + eta[1,],  identity_matrix(2))';
+  // Y_ppd[1,] = multi_normal_rng(mu_ppd[1,] + eta[1,],  identity_matrix(2))';
+  Y_ppd[1,1] = normal_rng(mu_ppd[1,1] + eta[1,1],  1);
+  Y_ppd[1,2] = normal_rng(mu_ppd[1,2] + eta[1,2],  1);
   
   // ppd draws projected to S^1
   matrix[N+N_ppd, 2] U_ppd;
@@ -86,7 +94,9 @@ generated quantities {// Post-processed Parameters
   for (t in 2:(N+1)) {
     mu_ppd[t,] = (mu_0 + auto_cor_mat * Y[t-1,]')';
     // Prediction/backcast for time t given observed Y_1,...,Y_{N+1}
-    Y_ppd[t, ] = multi_normal_rng(mu_ppd[t,] + eta[t,],  identity_matrix(2))';
+    // Y_ppd[t, ] = multi_normal_rng(mu_ppd[t,] + eta[t,],  identity_matrix(2))';
+    Y_ppd[t,1] = normal_rng(mu_ppd[t,1] + eta[t,1], 1);
+    Y_ppd[t,2] = normal_rng(mu_ppd[t,2] + eta[t,2], 1);
     U_ppd[t, ] = Y_ppd[t,] / sqrt(dot_self(Y_ppd[t,]));
     theta_ppd[t] = atan2(U_ppd[t, 2], U_ppd[t, 1]);
   }
@@ -94,7 +104,9 @@ generated quantities {// Post-processed Parameters
   for (t in 2:N_ppd) {
     mu_ppd[N+t,] = (mu_0 + auto_cor_mat * Y_ppd[N+t-1,]')';
     // Forecast for time t given observed Y_N+2,...,Y_{N+N_ppd}
-    Y_ppd[N+t, ] = multi_normal_rng(mu_ppd[N+t,] + eta[N+t,],  identity_matrix(2))';
+    // Y_ppd[N+t, ] = multi_normal_rng(mu_ppd[N+t,] + eta[N+t,],  identity_matrix(2))';
+    Y_ppd[N+t,1] = normal_rng(mu_ppd[N+t,1] + eta[N+t,1], 1);
+    Y_ppd[N+t,2] = normal_rng(mu_ppd[N+t,2] + eta[N+t,2], 1);
     U_ppd[N+t, ] = Y_ppd[N+t,] / sqrt(dot_self(Y_ppd[N+t,]));
     theta_ppd[N+t] = atan2(U_ppd[N+t, 2], U_ppd[N+t, 1]);
   }
