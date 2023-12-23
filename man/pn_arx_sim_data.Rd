@@ -7,7 +7,7 @@
 pn_arx_sim_data(
   N = 100,
   mu_0 = c(0, 0),
-  B_vec = c(1, 3, 0, -5),
+  B_vec = c(1, 0.3, 0, -2.5),
   Psi_vec = c(0.75, -0.2, -0.2, 0.5),
   Sigma_vec = c(1, 0, 0, 1),
   X = NULL,

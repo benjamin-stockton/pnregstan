@@ -17,7 +17,7 @@
 #' @examples
 #' df <- pn_arx_sim_data(N = 100, ar_X1 = c(0.24), ma_X1 = numeric(0),
 #'                       ar_X2 = c(0.75), ma_X2 = c(-0.25, 0.25))
-pn_arx_sim_data <- function(N = 100, mu_0 = c(0,0), B_vec = c(1, 3, 0, -5), Psi_vec = c(0.75, -.2, -.2, .5), Sigma_vec = c(1,0,0,1), X = NULL, ar_X1 = NULL, ma_X1 = NULL, ar_X2 = NULL, ma_X2 = NULL) {
+pn_arx_sim_data <- function(N = 100, mu_0 = c(0,0), B_vec = c(1, .3, 0, -2.5), Psi_vec = c(0.75, -.2, -.2, .5), Sigma_vec = c(1,0,0,1), X = NULL, ar_X1 = NULL, ma_X1 = NULL, ar_X2 = NULL, ma_X2 = NULL) {
   
   B <- matrix(B_vec, nrow = 2)
   Psi <- matrix(Psi_vec, nrow = 2)
@@ -39,17 +39,19 @@ pn_arx_sim_data <- function(N = 100, mu_0 = c(0,0), B_vec = c(1, 3, 0, -5), Psi_
     )
   }
   else {
-    X_mat <- X_mat
+    X_mat <- X
   }
   
   mu <- X_mat %*% B
   
   Y <- matrix(NA, nrow = N, ncol = 2)
   U <- matrix(NA, nrow = N, ncol = 2)
-  Y[1,] <- mvtnorm::rmvnorm(1, mu_0 + mu[1,], Sigma)
+  eps_0 <- mvtnorm::rmvnorm(1, rep(0,2), Sigma)
+  Y[1,] <- mu_0 + mu[1,] + eps_0
   U[1,] <- Y[1,] / sqrt(Y[1,1]^2 + Y[1,2]^2)
   for (i in 2:N) {
-    Y[i,] <- mvtnorm::rmvnorm(1, Y[i-1,] %*% Psi + mu[i,], Sigma)
+    eps_i <- mvtnorm::rmvnorm(1, rep(0,2), Sigma)
+    Y[i,] <- mu_0 + Y[i-1,] %*% Psi + mu[i,] + eps_i
     U[i,] <- Y[i,] / sqrt(Y[i,1]^2 + Y[i,2]^2)
   }
   
