@@ -41,29 +41,19 @@ model {
   matrix[N, 2] mu = rep_matrix(mu_0, N) + X_centered * B_mat;
   latent_lengths ~ normal(0, 10);
   
-<<<<<<< Updated upstream
   mu_0 ~ normal(0, 1000);
   to_vector(B_mat) ~ normal(0, 1000);
   to_vector(auto_cor_mat) ~ normal(0, 1000);
-=======
-  mu_0 ~ normal(0, 10);
-  to_vector(B_mat) ~ normal(0, 100);
-  to_vector(auto_cor_mat) ~ normal(0, 1);
->>>>>>> Stashed changes
   
   // mu[1,] += mu_0;
   real A = dot_self(U[1,]);
   real B = U[1,] * mu[1,]';
-<<<<<<< Updated upstream
   vector[N] lengths_llpd;
   lengths_llpd[1] = log(latent_lengths[1]) - 1.0 / 2 * A * (latent_lengths[1] - B / A)^2;
-=======
-  target += log(latent_lengths[1]) - 1.0 / 2 * A * (latent_lengths[1] - B / A)^2;
   
   // Y[1,] ~ multi_normal(mu[1,], identity_matrix(2));
   // Y[1,1] ~ normal(mu[1,1], 1);
   // Y[1,2] ~ normal(mu[1,2], 1);
->>>>>>> Stashed changes
   
   // Latent Length sampling
   for (t in 2:N) {
@@ -72,21 +62,13 @@ model {
       B = U[t,] * mu[t,]';
       lengths_llpd[t] = log(latent_lengths[t]) - 1.0 / 2 * A * (latent_lengths[t] - B / A)^2;
       // Y[t,] ~ multi_normal_prec(mu[t,],  identity_matrix(2));
-<<<<<<< Updated upstream
       // Y[t,1] ~ normal(mu[1], 1);
       // Y[t,2] ~ normal(mu[2], 1);
   }
   target += sum(lengths_llpd);
-  
-  // Y[1,] ~ multi_normal(mu[1,], identity_matrix(2));
-  Y[,1] ~ normal(mu[,1], 1);
-  Y[,2] ~ normal(mu[,2], 1);
-=======
       
-  }
     Y[,1] ~ normal(mu[,1], 1);
     Y[,2] ~ normal(mu[,2], 1);
->>>>>>> Stashed changes
 }
 
 generated quantities {// Post-processed Parameters

@@ -59,6 +59,8 @@ model {
     matrix[2,2] Sigma_i;
     matrix[2,2] Lambda_i;
     
+    vector[N] length_llpd;
+    
     // Latent Length sampling
     for (i in 1:N) {
         Sigma_i[1, 1] = sigma2 + gamma[i]^2;
@@ -71,9 +73,12 @@ model {
         Lambda_i[2,2] = (sigma2 + gamma[i]^2) / sigma2;
         real A_i = quad_form(Lambda_i, U[i,]');
         real B_i = U[i,] * Lambda_i *  mu[i,]';
-        target+= log(latent_lengths[i]) - 1.0 / 2 * A_i * (latent_lengths[i] - B_i / A_i)^2;
-      Y[i,] ~ multi_normal(mu[i,], Sigma_i);
+        length_llpd[i] = log(latent_lengths[i]) - 1.0 / 2 * A_i * (latent_lengths[i] - B_i / A_i)^2;
+        // Y[i,] ~ multi_normal(mu[i,], Sigma_i);
+        Y[i,1] ~ normal(mu[i,1] + gamma[i] * (Y[i,2] - mu[i,2]), sigma);
+        Y[i,2] ~ normal(mu[i,2], 1);
     }
+    target += sum(length_llpd);
 }
 
 generated quantities {
@@ -114,7 +119,9 @@ generated quantities {
         Sigma_i[1, 2] = gamma_ppd[n];
         Sigma_i[2, 1] = gamma_ppd[n];
         Sigma_i[2, 2] = 1;
-        Y_ppd[n,] = multi_normal_rng(mu_ppd[n,], Sigma_i)';
+        Y_ppd[n,2] = normal_rng(mu_ppd[n,2], 1);
+        Y_ppd[n,1] = normal_rng(mu_ppd[n,1] + gamma_ppd[n] * (Y_ppd[n,2] - mu_ppd[n,2]), sigma);
+        // Y_ppd[n,] = multi_normal_rng(mu_ppd[n,], Sigma_i)';
         U_ppd[n,] = Y_ppd[n,] / sqrt(dot_self(Y_ppd[n,]));
         theta_ppd[n] = atan2(U_ppd[n,2], U_ppd[n,1]);
     }

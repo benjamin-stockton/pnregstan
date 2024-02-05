@@ -33,6 +33,8 @@ fit_pnreg_identity_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter
                     U = U,
                     X = X_mat,
                     X_ppd = X_ppd_mat)
+  
+  
   fit <- model$sample(data = data_list, 
                       iter_sampling = iter_sampling,
                       iter_warmup = iter_warmup,
