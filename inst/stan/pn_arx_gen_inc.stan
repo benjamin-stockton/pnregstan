@@ -12,7 +12,7 @@ data {
   real<lower=0> sigma_0;
   
   int<lower=0> N_ppd;
-  matrix[N_tilde, K] X_ppd;
+  matrix[N_ppd, K] X_ppd;
 }
 
 transformed data {

@@ -66,11 +66,11 @@ model {
     mu[t,] = (mu_0' + Y[t-1,] * auto_cor_mat + X_centered[t,] * B_mat);
     // Y[t,] ~ multi_normal(mu[t,], Sigma);
   }
-  Y[,1] ~ normal(mu[,1], 1.0));
+  Y[,1] ~ normal(mu[,1], 1.0);
   Y[,2] ~ normal(mu[,2], 1.0);
   
   // Latent Length sampling
-  matrix[N_obs, 2] mu_obs = mu[ind_obs,];
+  matrix[N_obs, 2] mu_obs = mu[obs_ind,];
   vector[N_obs] lengths_llpd;
   for (t in 1:N_obs) {
       real A = dot_self(U_obs[t,]);

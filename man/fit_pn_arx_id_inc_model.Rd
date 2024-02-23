@@ -44,9 +44,11 @@ if (instantiate::stan_cmdstan_exists()) {
   df <- pn_arx_sim_data(N = 100, 
   ar_X1 = c(0.24), ma_X1 = numeric(0), 
   ar_X2 = c(0.75), ma_X2 = c(-0.25, 0.25))
+  s <- sample(1:90, size = 10)
+  df[s, "theta"] <- NA
   
   df_ppd <- df[91:100,]
-  fit_pn_arx_model(theta = df$theta[1:90], 
+  fit_pn_arx_id_inc_model(theta = df$theta[1:90], 
   X = df[1:90,c("X1", "X2")], 
   X_ppd = df_ppd[,c("X1", "X2")])
   
