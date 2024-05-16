@@ -69,7 +69,7 @@ fit_pn_arx_id_inc_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_
 #'     X_ppd = df[91:100, c("X1", "X2")])
 create_pnarxid_inc_data_list <- function(theta, X, X_ppd, sigma_0 = 100, ...) {
   theta_obs <- theta[which(!is.na(theta))]
-  stopifnot(is.numeric(theta_obs) && max(abs(theta_obs)) < 2*pi)
+  stopifnot(is.numeric(theta_obs) && max(abs(theta_obs)) <= 2*pi)
   U <- angle_to_unit_vec(theta_obs)
   data_list <- list(N_obs = sum(!is.na(theta)),
                     N_mis = sum(is.na(theta)),

@@ -20,7 +20,7 @@
 #' }
 #' ## End(Not run)
 fit_pnreg_gen_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 3000, refresh = 500, ...) {
-  stopifnot(is.numeric(theta) && max(abs(theta)) < 2*pi)
+  stopifnot(is.numeric(theta) && max(abs(theta)) <= 2*pi)
   U <- angle_to_unit_vec(theta)
   X_mat <- stats::model.matrix(~., data = as.data.frame(X))
   X_ppd_mat <- stats::model.matrix(~., data = as.data.frame(X_ppd))

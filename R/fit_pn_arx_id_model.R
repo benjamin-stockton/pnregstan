@@ -28,7 +28,7 @@
 #' }
 #' ## End(Not run)
 fit_pn_arx_id_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, chains = 2, ...) {
-  stopifnot(is.numeric(theta) && max(abs(theta)) < 2*pi)
+  stopifnot(is.numeric(theta) && max(abs(theta)) <= 2*pi)
   U <- angle_to_unit_vec(theta)
   
   model <- instantiate::stan_package_model(
