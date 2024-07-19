@@ -19,9 +19,9 @@
 #'                       ar_X2 = c(0.75), ma_X2 = c(-0.25, 0.25))
 pn_arx_sim_data <- function(N = 100, mu_0 = c(0,0), B_vec = c(1, .3, 0, -2.5), Psi_vec = c(0.75, -.2, -.2, .5), Sigma_vec = c(1,0,0,1), X = NULL, ar_X1 = NULL, ma_X1 = NULL, ar_X2 = NULL, ma_X2 = NULL) {
   
-  B <- matrix(B_vec, nrow = 2)
-  Psi <- matrix(Psi_vec, nrow = 2)
-  Sigma <- matrix(Sigma_vec, nrow = 2)
+  B <- matrix(B_vec, ncol = 2)
+  Psi <- matrix(Psi_vec, ncol = 2)
+  Sigma <- matrix(Sigma_vec, ncol = 2)
   
   if (is.null(ar_X1) && is.na(ar_X1) && is.null(X)) {
     ar_X1 <- c(0.24)
