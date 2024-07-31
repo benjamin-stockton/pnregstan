@@ -15,7 +15,12 @@
 #' @examples
 #' if (instantiate::stan_cmdstan_exists()) {
 #'   df <- pnreg_sim_data(N = 100, mu_X = 0, sigma_X = 1)
-#'   fit_pnreg_identity_model(theta = df$theta, X = df$X, X_ppd = df$X)
+#'   fit_pnreg_identity_model(theta = df$theta, X = df$X, X_ppd = df$X,
+#'   refresh = 0,
+#'   iter_warmup = 10,
+#'   iter_sampling = 10,
+#'   show_messages = FALSE,
+#'   show_exceptions = FALSE)
 #' }
 fit_pnreg_identity_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500,...) {
   stopifnot(is.numeric(theta) && max(abs(theta)) <= 2*pi)

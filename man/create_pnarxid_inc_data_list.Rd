@@ -4,18 +4,16 @@
 \alias{create_pnarxid_inc_data_list}
 \title{Create Data List for PN ARXID Incomplete Model}
 \usage{
-create_pnarxid_inc_data_list(theta, X, X_ppd, sigma_0 = 100, ...)
+create_pnarxid_inc_data_list(theta, X, X_ppd, sigma_0 = 100)
 }
 \arguments{
-\item{theta}{}
+\item{theta}{vector of angles}
 
-\item{X}{}
+\item{X}{Matrix of predictors}
 
-\item{X_ppd}{}
+\item{X_ppd}{Matrix of hold-out predictors}
 
-\item{sigma_0}{}
-
-\item{...}{}
+\item{sigma_0}{Hyperparameter for mu_0}
 }
 \value{
 data_list a list to pass to Stan

@@ -5,7 +5,11 @@ test_that("PN Reg Gen Sampling Runs", {
   fit <- fit_pnreg_gen_model(theta = df$theta,
                             X = df[,c("X")],
                             X_ppd = df_ppd[,c("X")],
-                            refresh = 0)
+                            refresh = 0,
+                            iter_warmup = 10,
+                            iter_sampling = 10,
+                            show_messages = FALSE,
+                            show_exceptions = FALSE)
   
   expect_contains(class(fit), "CmdStanFit")
 })
@@ -24,7 +28,11 @@ test_that("PN Reg Gen Sampling Runs", {
   fit <- fit_pnreg_gen_model(theta = df$theta,
                              X = X,
                              X_ppd = X_ppd,
-                             refresh = 0)
+                             refresh = 0,
+                             iter_warmup = 10,
+                             iter_sampling = 10,
+                             show_messages = FALSE,
+                             show_exceptions = FALSE)
   
   expect_contains(class(fit), "CmdStanFit")
 })

@@ -38,10 +38,10 @@ test_that("PN ARXID Incomplete Sampling Runs", {
   fit <- fit_pn_arx_id_inc_model(theta = df$theta,
                           X = df[,c("X1", "X2")],
                           X_ppd = df_ppd[,c("X1", "X2")],
-                          iter_sampling = 10,
-                          iter_warmup = 10,
                           refresh = 0,
-                          show_messages = TRUE,
+                          iter_warmup = 10,
+                          iter_sampling = 10,
+                          show_messages = FALSE,
                           show_exceptions = FALSE)
   
   expect_contains(class(fit), "CmdStanFit")

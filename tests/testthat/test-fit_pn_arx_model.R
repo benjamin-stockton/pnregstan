@@ -5,8 +5,10 @@ test_that("PN ARX Sampling Runs", {
   fit <- fit_pn_arx_model(theta = df$theta,
                              X = df[,c("X")],
                              X_ppd = df_ppd[,c("X")],
-                             refresh = 500,
-                          show_messages = TRUE,
+                          refresh = 0,
+                          iter_warmup = 10,
+                          iter_sampling = 10,
+                          show_messages = FALSE,
                           show_exceptions = FALSE, 
                           chains = 1)
   
@@ -27,8 +29,10 @@ test_that("PN ARX Sampling Runs with Fixed X", {
   fit <- fit_pn_arx_model(theta = df$theta,
                              X = X,
                              X_ppd = X_ppd,
-                             refresh = 500,
-                          show_messages = TRUE,
+                          refresh = 0,
+                          iter_warmup = 10,
+                          iter_sampling = 10,
+                          show_messages = FALSE,
                           show_exceptions = FALSE)
   
   expect_contains(class(fit), "CmdStanFit")

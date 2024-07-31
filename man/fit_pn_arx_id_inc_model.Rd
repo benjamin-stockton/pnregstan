@@ -16,21 +16,21 @@ fit_pn_arx_id_inc_model(
 )
 }
 \arguments{
-\item{theta}{}
+\item{theta}{vector of angles}
 
-\item{X}{}
+\item{X}{Matrix of predictors}
 
-\item{X_ppd}{}
+\item{X_ppd}{Matrix of hold-out predictors}
 
-\item{iter_sampling}{}
+\item{iter_sampling}{int iterations for sampling}
 
-\item{iter_warmup}{}
+\item{iter_warmup}{int iterations for warmup}
 
-\item{refresh}{}
+\item{refresh}{int how often to print to screen}
 
-\item{chains}{}
+\item{chains}{int number of MCMC chains}
 
-\item{...}{}
+\item{...}{other arguments to pass to CmdStan}
 }
 \value{
 CmdStan fit
@@ -50,7 +50,12 @@ if (instantiate::stan_cmdstan_exists()) {
   df_ppd <- df[91:100,]
   fit_pn_arx_id_inc_model(theta = df$theta[1:90], 
   X = df[1:90,c("X1", "X2")], 
-  X_ppd = df_ppd[,c("X1", "X2")])
+  X_ppd = df_ppd[,c("X1", "X2")],
+  refresh = 0,
+  iter_warmup = 10,
+  iter_sampling = 10,
+  show_messages = FALSE,
+  show_exceptions = FALSE)
   
   
 }

@@ -10,7 +10,8 @@ Depends: R (>= 4.0)
 Imports:
     instantiate,
     mvtnorm,
-    stats
+    stats,
+    posterior
 Additional_repositories:
   https://mc-stan.org/r-packages/
 SystemRequirements: CmdStan (https://mc-stan.org/users/interfaces/cmdstan)

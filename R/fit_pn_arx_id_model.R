@@ -24,7 +24,12 @@
 #'   df_ppd <- df[91:100,]
 #'   fit_pn_arx_model(theta = df$theta[1:90], 
 #'   X = df[1:90,c("X1", "X2")], 
-#'   X_ppd = df_ppd[,c("X1", "X2")])
+#'   X_ppd = df_ppd[,c("X1", "X2")],
+#'   refresh = 0,
+#'   iter_warmup = 10,
+#'   iter_sampling = 10,
+#'   show_messages = FALSE,
+#'   show_exceptions = FALSE)
 #' }
 #' ## End(Not run)
 fit_pn_arx_id_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, chains = 2, ...) {

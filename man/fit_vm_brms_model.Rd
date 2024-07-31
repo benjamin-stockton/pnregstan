@@ -27,7 +27,7 @@ fit_vm_brms_model(
 
 \item{refresh}{int how often to print updates to console}
 
-\item{...}{}
+\item{...}{Other arguments to pass to cmdstan}
 }
 \value{
 CmdStan fit object
@@ -38,7 +38,12 @@ Fit the von Mises Regression Using Stan
 \examples{
 if (instantiate::stan_cmdstan_exists()) {
   df <- pnreg_sim_data(N = 100, mu_X = 0, sigma_X = 1)
-  fit_vm_brms_model(theta = df$theta, X = df$X, X_ppd = df$X)
+  fit_vm_brms_model(theta = df$theta, X = df$X, X_ppd = df$X, 
+  refresh = 0,
+  iter_warmup = 10,
+  iter_sampling = 10,
+  show_messages = FALSE,
+  show_exceptions = FALSE)
 }
 }
 \seealso{
