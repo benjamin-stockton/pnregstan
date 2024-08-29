@@ -35,7 +35,7 @@
 #' ## End(Not run)
 fit_pgp_geostat_model <- function(loc1, loc2, theta, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, chains = 2, ...) {
   
-  data_list <- create_pgp_geostat_reg_data_list(loc1 = loc1, loc2 = loc2, theta = theta)
+  data_list <- create_pgp_geostat_data_list(loc1 = loc1, loc2 = loc2, theta = theta)
   
   model <- instantiate::stan_package_model(
     name = "wang_gelfand_pgp",
