@@ -46,7 +46,7 @@ fit_pgp_geostat_reg_inc_model <- function(loc1, loc2, theta, X, iter_sampling = 
     name = "pgp_geostat_reg_inc",
     package = "pnregstan"
   )
-  print(data_list)
+  # print(data_list)
   
   fit <- model$sample(data = data_list,
                       iter_sampling = iter_sampling,
@@ -111,8 +111,8 @@ create_pgp_geostat_reg_inc_data_list <- function(loc1, loc2, theta, X) {
     
     stopifnot(length(mis_ind) > 0)
   }
-  print(str(theta_obs))
-  print(max(abs(theta_obs)))
+  # print(str(theta_obs))
+  # print(max(abs(theta_obs)))
   stopifnot(is.numeric(theta_obs) && max(abs(theta_obs)) <= 2*pi)
   
   data_list <- list(N_obs = nrow(loc_obs),
