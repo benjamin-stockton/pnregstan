@@ -114,7 +114,6 @@ create_jpgpmgp_geostat_reg_inc_data_list <- function(loc1, loc2, theta, Y, X) {
     X <- matrix(X, ncol = 1)
     P <- 1
   } else if (is.matrix(X) && ncol(X) > 1) {
-    X <- 
     P <- ncol(X)
   }
   
