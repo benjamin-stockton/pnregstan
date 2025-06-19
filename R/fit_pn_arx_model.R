@@ -3,6 +3,7 @@
 #' @param theta vector angular time series; values should be between 0 and 2*pi
 #' @param X vector or matrix of predictor time series for training data
 #' @param X_ppd vector or matrix of predictor time series for testing data
+#' @param weakly_inf_prior bool switch for a weakly informative prior (TRUE) on the coefficients vs uninformative prior (FALSE)
 #' @param iter_sampling int MCMC sampling iterations to send to CmdStan
 #' @param iter_warmup int MCMC warmup iterations to send to CmdStan
 #' @param refresh  int how often should CmdStan print an update during sampling
@@ -30,7 +31,7 @@
 #'   show_exceptions = FALSE)
 #' }
 #' ## End(Not run)
-fit_pn_arx_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, chains = 2, ...) {
+fit_pn_arx_model <- function(theta, X, X_ppd, weakly_inf_prior = FALSE, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, chains = 2, ...) {
   stopifnot(is.numeric(theta) && max(abs(theta)) <= 2*pi)
   U <- angle_to_unit_vec(theta)
   X_mat <- stats::model.matrix(~., data = as.data.frame(X))
@@ -47,6 +48,7 @@ fit_pn_arx_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup 
                     X = X_mat,
                     X_ppd = X_ppd_mat,
                     # hyperparameters
+                    weakly_inf_prior = as.numeric(weakly_inf_prior),
                     sigma_0 = 100)
   fit <- model$sample(data = data_list, 
                       iter_sampling = iter_sampling,

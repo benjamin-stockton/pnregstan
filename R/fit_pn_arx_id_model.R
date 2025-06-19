@@ -5,6 +5,7 @@
 #' @param theta vector angles
 #' @param X matrix of exogenous predictors
 #' @param X_ppd matrix of exogenous predictors for PPD draws
+#' @param weakly_inf_prior bool switch for a weakly informative prior (TRUE) on the coefficients vs uninformative prior (FALSE)
 #' @param iter_sampling int iterations for sampling
 #' @param iter_warmup int iterations for warmup
 #' @param refresh int how often to print to screen
@@ -32,7 +33,7 @@
 #'   show_exceptions = FALSE)
 #' }
 #' ## End(Not run)
-fit_pn_arx_id_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, chains = 2, ...) {
+fit_pn_arx_id_model <- function(theta, X, X_ppd, weakly_inf_prior = FALSE, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, chains = 2, ...) {
   stopifnot(is.numeric(theta) && max(abs(theta)) <= 2*pi)
   U <- angle_to_unit_vec(theta)
   
@@ -46,6 +47,7 @@ fit_pn_arx_id_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warm
                     U = U,
                     X = X,
                     X_ppd = X_ppd, 
+                    weakly_inf_prior = as.numeric(weakly_inf_prior),
                     sigma_0 = 10)
   fit <- model$sample(data = data_list,
                       iter_sampling = iter_sampling,

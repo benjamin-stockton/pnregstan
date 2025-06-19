@@ -20,6 +20,7 @@ test_that("Data list creation is correct", {
     U_obs = U,
     X = df[1:90,c("X1", "X2")],
     X_ppd = df[91:100,c("X1", "X2")], 
+    weakly_inf_prior = 0,
     sigma_0 = 100
   )
   

@@ -3,6 +3,7 @@
 #' @param theta vector of angles
 #' @param X Matrix of predictors
 #' @param X_ppd Matrix of hold-out predictors
+#' @param weakly_inf_prior bool switch for a weakly informative prior (TRUE) on the coefficients vs uninformative prior (FALSE)
 #' @param iter_sampling int iterations for sampling
 #' @param iter_warmup int iterations for warmup
 #' @param refresh int how often to print to screen
@@ -34,9 +35,13 @@
 #'   
 #' }
 #' ## End(Not run)
-fit_pn_arx_id_inc_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, chains = 2, ...) {
+fit_pn_arx_id_inc_model <- function(theta, X, X_ppd, weakly_inf_prior = FALSE, iter_sampling = 1000, iter_warmup = 1000, refresh = 500, chains = 2, ...) {
   
-  data_list <- create_pnarxid_inc_data_list(theta = theta, X = X, X_ppd = X_ppd, sigma_0 = 100)
+  data_list <- create_pnarxid_inc_data_list(theta = theta, 
+                                            X = X, 
+                                            X_ppd = X_ppd, 
+                                            weakly_inf_prior = weakly_inf_prior, 
+                                            sigma_0 = 100)
   
   model <- instantiate::stan_package_model(
     name = "pn_arx_id_inc",
@@ -57,6 +62,7 @@ fit_pn_arx_id_inc_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_
 #' @param theta vector of angles
 #' @param X Matrix of predictors
 #' @param X_ppd Matrix of hold-out predictors
+#' @param weakly_inf_prior bool switch for a weakly informative prior (TRUE) on the coefficients vs uninformative prior (FALSE)
 #' @param sigma_0 Hyperparameter for mu_0
 #'
 #' @return data_list a list to pass to Stan
@@ -71,7 +77,7 @@ fit_pn_arx_id_inc_model <- function(theta, X, X_ppd, iter_sampling = 1000, iter_
 #' create_pnarxid_inc_data_list(df$theta[1:90], 
 #'     df[1:90, c("X1", "X2")], 
 #'     X_ppd = df[91:100, c("X1", "X2")])
-create_pnarxid_inc_data_list <- function(theta, X, X_ppd, sigma_0 = 100) {
+create_pnarxid_inc_data_list <- function(theta, X, X_ppd, weakly_inf_prior = FALSE, sigma_0 = 100) {
   theta_obs <- theta[which(!is.na(theta))]
   stopifnot(is.numeric(theta_obs) && max(abs(theta_obs)) <= 2*pi)
   U <- angle_to_unit_vec(theta_obs)
@@ -84,6 +90,7 @@ create_pnarxid_inc_data_list <- function(theta, X, X_ppd, sigma_0 = 100) {
                     U_obs = U,
                     X = X,
                     X_ppd = X_ppd, 
+                    weakly_inf_prior = as.numeric(weakly_inf_prior),
                     sigma_0 = 100)
   
   return(data_list)
